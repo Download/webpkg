@@ -1,0 +1,15 @@
+{
+  "name": "webpkg",
+  "version": "0.1.0",
+  "description": "Load your webpack configuration from package.json",
+  "main": "webpkg.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "webpack",
+    "pkgcfg"
+  ],
+  "author": "Stijn de Witt",
+  "license": "CC-BY-4.0"
+}
