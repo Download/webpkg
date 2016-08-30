@@ -47,18 +47,58 @@ Now, you can configure webpack from your package.json:
 All standard [Webpack configuration options](https://webpack.github.io/docs/configuration.html) are supported.
 
 Configuring a full Webpack project from scratch is a lot of work, so `webpkg`
-offers some extra options to help you with this:
+offers some extra options to help you with this. These options are used in the
+top level (or levels, see [option inheritance](#option-inheritance)) of your
+webpack configuration:
 
 ### basecfg
 Set this to the name of an (installed) module yielding a webpack configuration
 when `require`d and it will be used as the base configuration; the other changes
 you make in `package.json` will be applied on top of this base configuration.
 
+#### examples
+Given this configuration in `./test/base.js`:
+```js
+module.exports = {
+  context: 'base',
+  entry: 'base'
+}
+```
+and this configuration in `package.json`:
+
+```json
+{
+  "name": "webpkg-basecfg",
+  "version": "1.0.0",
+  "webpack": {
+    "basecfg": "./test/base",
+    "entry": "override",
+  }
+}
+```
+The resulting configuration would be:
+```json
+{
+    "context": "base",
+    "entry": "override"
+  }
+}
+```
+Instead of a string with a module name, we can set `basecfg` to an array of
+strings with module names:
+
+All configurations will be applied on top of one another, in the order in which
+they are listed
+
 ### extcfg
 Set this to the name of an (installed) module yielding a webpack configuration
 when `require`d and it will be used as an extension to the base configuration;
 it will first be applied to the base configuration after which the changes you
 make in `package.json` will be applied on top of that.
+
+`extcfg` works in exactly the same way as `basecfg`. Only when used together
+does an extra behavior arrise: `basecfg` is applied first and then `extcfg`
+is applied on top of that. This is convenient in combination with *option inheritance*.
 
 
 ## option inheritance
