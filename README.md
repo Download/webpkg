@@ -132,7 +132,6 @@ prioritize the `WEBPKG` environment variable, so it takes the path
 ## Integration with `pkgcfg`
 Need more dynamic behavior? `webpkg` works well with [pkgcfg](https://npmjs.com/package/pkgcfg).
 
-### Install `pkgcfg`
 ```sh
 npm install --save pkgcfg
 ```
