@@ -73,6 +73,7 @@ There are two environment variables that `webpkg` will respond to:
 * `WEBPKG`: e.g. `'client'`, `'server'`, etc
 * `NODE_ENV`: e.g. `'production'`, `'development'`, `'test'` etc.
 
+### rules
 You can use both environment variables at the same time. However, please observe
 these rules:
 * The names of top-level webpack configuration variables may not be used
