@@ -121,12 +121,13 @@ The option `entry` would yield different values depending on `WEBPKG` and `NODE_
 * `WEBPKG=client, NODE_ENV=production` ==> 'client'
 
 In the first two cases, `webpkg` has no choice but to follow the paths
+* `webpack->development->server`
 * `webpack->production->server`
-* `webpack->production->client`
 
 However, for the last two cases, `webpkg` is given a choice, as `webpack` has both
-the properties `production` and `client`. Due to the third rule, `webpkg` will
-prioritize the `WEBPKG` environment variable, so it takes the path
+the properties `production`/`development` as well as `client`.
+Due to the third rule, `webpkg` will prioritize the `WEBPKG` environment variable,
+so it takes the path
 * `webpack->client` at which point it can't go deeper.
 
 ## Integration with `pkgcfg`
