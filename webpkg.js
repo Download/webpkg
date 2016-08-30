@@ -98,19 +98,11 @@ function loadWebpkg(pkg, e, t, p, path, result) {
   return result
 }
 
-function sanitize(webpkg) {
-  for (var prop in webpkg) {if (! OPTIONS[prop]) {delete webpkg[prop]}}
-  return webpkg;
+function sanitize(x) {
+  for (var p in x) {if (! OPTIONS[p]) {delete x[p]}}
+  return x;
 }
 
-
-var WEBPACK_OPTIONS = {
-  context:1, entry:1, output:1, module:1, resolve:1, resolveLoader:1,
-  externals:1, target:1, bail:1, profile:1, cache:1, watch:1, watchOptions:1,
-  debug:1, devtool:1, devServer:1, node:1, amd:1, loader:1,
-  recordsPath:1, recordsInputPath:1, recordsOutputPath:1, plugins:1
-}
-var WEBPKG_OPTIONS = {
-  basecfg:1, pluginsPre:1, pluginsPost:1
-}
-var OPTIONS = extend({}, WEBPACK_OPTIONS, WEBPKG_OPTIONS)
+var OPTIONS = {context:1, entry:1, output:1, module:1, resolve:1, resolveLoader:1, externals:1,
+    target:1, bail:1, profile:1, cache:1, watch:1, watchOptions:1, debug:1, devtool:1, devServer:1,
+    node:1, amd:1, loader:1, recordsPath:1, recordsInputPath:1, recordsOutputPath:1, plugins:1}
