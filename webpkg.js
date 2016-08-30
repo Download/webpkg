@@ -1,14 +1,13 @@
 var fs = require('fs')
 var path = require('path')
-var extend = require('extend');
-var appRoot = require('app-root-path');
-var WebpackOptionsDefaulter = require("webpack/lib/WebpackOptionsDefaulter");
-var log; try {require.resolve('picolog'); log=require('picolog');} catch(e){}
+var extend = require('extend')
+var appRoot = require('app-root-path')
+var log; try {log=require('picolog');} catch(e){}
 
 function webpkg(pkg, env) {
   if (!pkg) {
     pkg = path.resolve(appRoot.toString(), 'package.json')
-    log && log.log('webpkg: using configuration from ' + pkg)
+    log && log.debug('webpkg: using configuration from ' + pkg)
   }
   if (typeof pkg == 'string') {
     log && log.log('webpkg: loading configuration from file ' + pkg)
@@ -17,53 +16,93 @@ function webpkg(pkg, env) {
   env = env || (typeof process == 'object' && process.env) || {}
   var e, t;
   if (! (e = env.NODE_ENV)) {
-    e = 'production'
-    log && log.log('webpkg: NODE_ENV not set. Defaulting to "production"')
+    e = ''
+    log && log.debug('webpkg: NODE_ENV not set. Defaulting to "" (empty string)')
   }
   if (! (t = env.WEBPKG)) {
     t = ''
-    log && log.log('webpkg: WEBPKG not set. Profiles are disabled.')
+    log && log.debug('webpkg: WEBPKG not set. Profiles are disabled.')
   }
-  pkg && log && log.info('webpkg: using configuration: NODE_ENV:"' + e + '", WEBPKG: ' + (t ? '"' + t + '"' : '"" (disabled)'))
-  return loadConfiguration(pkg, e, t);
+  log && log.info('webpkg: using configuration: ' +
+      'NODE_ENV:' + (e ? '"' + e + '"' : '"" (disabled)') + ', ' +
+      'WEBPKG:'   + (t ? '"' + t + '"' : '"" (disabled)')
+  )
+  return webpkg.load(pkg, e, t);
 }
 
 module.exports = webpkg
+webpkg.load = loadConfiguration
 
 // === IMPLEMENTATION ===
 
 function loadConfiguration(pkg, e, t) {
   var result = {entry: pkg && (pkg.main || (pkg.name && pkg.name + '.js')) || 'index.js', plugins:[]}
-//  result = extend(result, loadDefaults(pkg))
-  result = extend(result, loadBase(pkg))
-  result = extend(result, loadWebpkg(pkg))
-  return result;
+  var wpk = loadWebpkg(pkg, e, t);
+  result = extend(true, result, loadBaseExt(wpk))
+  result = extend(true, result, wpk)
+  return sanitize(result);
 }
 
-function loadDefaults(pkg) {
-  var defaults = {entry:'index.js', plugins:[]}
-  new WebpackOptionsDefaulter().process(defaults);
-  return sanitize(defaults)
-}
-
-function loadBase(pkg) {
-  var result = {}, base = pkg.basecfg || []
-  if (typeof base == 'string') {base = [base]}
-  for (var i=0,b; b=base[i]; i++) {result = extend(result, require(b))}
+function loadBaseExt(p) {
+  log && log.debug('webpkg.loadBaseExt', p)
+  var result = {}
+  loadCfg(result, p, 'basecfg')
+  loadCfg(result, p, 'extcfg')
+  log && log.log('webpkg.loadBaseExt: base/ext configuration: ', result)
   return result
 }
 
-function loadWebpkg(pkg) {
-  var webpkg = {};
-  webpkg = sanitize(extend(webpkg, pkg && pkg.webpkg || {}))
-  webpkg = sanitize(extend(webpkg, pkg && pkg.webpkg && pkg.webpkg[e] || {}))
-  webpkg = sanitize(extend(webpkg, pkg && pkg.webpkg && pkg.webpkg[e] && pkg.webpkg[e][t] || {}))
-  return webpkg
+function loadCfg(result, p, name) {
+  var cfgs = p && (name in p) && p[name] || []
+  cfgs && log && log.debug('webpkg.loadCfg: loading configuration ' + name + ': ', cfgs)
+  if (typeof cfgs == 'string') {cfgs = [cfgs]}
+  return loadCfgs(result, cfgs)
+}
+
+function loadCfgs(result, cfgs) {
+  for (var i=0,c; c=cfgs[i]; i++) {
+    try {
+      log && log.log('webpkg.loadCfgs: loading configuration from ' + c)
+      var config = require(c);
+      log && log.debug('webpkg.loadCfgs: loaded configuration: ', config)
+      result = extend(true, result, config);
+      log && log.debug('webpkg.loadCfgs: merged in configuration. result: ', result)
+    } catch(e) {log.error('webpkg.loadCfgs: ERROR: Failed to load configuration from ' + c, e)}
+  }
+  return result
+}
+
+function loadWebpkg(pkg, e, t, p, path, result) {
+  if (!p) {
+    p = pkg && pkg.webpack
+    path = 'webpack'
+  }
+
+  if (! result) {
+    result = extend({}, p || {})
+    log && log.debug('webpkg.loadWebpkg: merged in webpack root configuration from package.json...', result)
+  }
+
+  if (p && t && p[t]) {
+    var pth = path + '.' + t;
+    result = extend(result, p[t])
+    log && log.debug('webpkg.loadWebpkg: merged in profile configuration from ' + pth, result)
+    loadWebpkg(pkg, e, t, p[t], pth, result)
+  }
+  else if (p && e && p[e]) {
+    var pth = path + '.' + e;
+    result = extend(result, p[e])
+    log && log.debug('webpkg.loadWebpkg: merged in environment configuration from ' + pth, result)
+    loadWebpkg(pkg, e, t, p[e], pth, result)
+  }
+  return result
 }
 
 function sanitize(webpkg) {
   for (var prop in webpkg) {if (! OPTIONS[prop]) {delete webpkg[prop]}}
+  return webpkg;
 }
+
 
 var WEBPACK_OPTIONS = {
   context:1, entry:1, output:1, module:1, resolve:1, resolveLoader:1,

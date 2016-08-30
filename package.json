@@ -1,11 +1,17 @@
 {
   "name": "webpkg",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Load your webpack configuration from package.json",
   "main": "webpkg.js",
   "scripts": {
-    "test": "mocha webpkg.spec.js",
-    "test-watch": "mocha --watch webpkg.spec.js"
+    "tst": "mocha webpkg.spec.js",
+    "tst-server": "cross-env WEBPKG=server npm run -s tst",
+    "tst-client": "cross-env WEBPKG=client npm run -s tst",
+    "tst-dev": "cross-env NODE_ENV=development npm run -s tst-server && cross-env NODE_ENV=development npm run -s tst-client",
+    "tst-prd": "cross-env NODE_ENV=production npm run tst-server && cross-env NODE_ENV=production npm run tst-client",
+    "tst-all": "npm run tst && npm run tst-dev && npm run tst-prd",
+    "test": "cross-env PICOLOG_LEVEL=info npm run -s tst-all",
+    "test-dev": "cross-env PICOLOG_LEVEL=log npm run -s tst-all"
   },
   "keywords": [
     "package.json",
@@ -17,12 +23,44 @@
   "license": "CC-BY-4.0",
   "devDependencies": {
     "chai": "^3.5.0",
+    "cross-env": "^2.0.1",
     "mocha": "^3.0.2",
     "picolog": "^1.0.4"
   },
   "dependencies": {
     "app-root-path": "^1.3.0",
-    "extend": "^3.0.0",
-    "webpack": "^1.13.2"
+    "extend": "^3.0.0"
+  },
+  "webpack": {
+    "basecfg": "./test/base",
+    "extcfg": "./test/extend",
+    "devtool": "standard",
+    "plugins": [
+      "test"
+    ],
+    "production": {
+      "extcfg": "./test/extend-production",
+      "devtool": "production",
+      "entry": "./production",
+      "client": {
+        "basecfg": "./test/base-production",
+        "devtool": "production-client"
+      },
+      "server": {
+        "basecfg": "./test/base-production",
+        "devtool": "production-server"
+      }
+    },
+    "development": {
+      "basecfg": "./test/base-development",
+      "devtool": "development",
+      "client": {
+        "devtool": "development-client",
+        "extcfg": "./test/extend-development-client"
+      },
+      "server": {
+        "devtool": "development-server"
+      }
+    }
   }
 }
