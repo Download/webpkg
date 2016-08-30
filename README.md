@@ -87,6 +87,18 @@ The resulting configuration would be:
 Instead of a string with a module name, we can set `basecfg` to an array of
 strings with module names:
 
+```json
+{
+  "name": "webpkg-basecfg",
+  "version": "1.0.0",
+  "webpack": {
+    "basecfg": [
+      "./test/base",
+      "./test/extend"
+    ],
+  }
+}
+```
 All configurations will be applied on top of one another, in the order in which
 they are listed
 
