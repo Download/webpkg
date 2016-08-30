@@ -131,6 +131,30 @@ Due to the third rule, `webpkg` will prioritize the `WEBPKG` environment variabl
 so it takes the path
 * `webpack->client` at which point it can't go deeper.
 
+## Running webpack from your NPM scripts
+We want to be able to say `npm run build-prod` or `npm run build-dev` and have it just work.
+Here is how we can configure our scripts section to accomplish that:
+
+```json
+{
+  "scripts": {
+    "build-dev": "cross-env NODE_ENV=development webpack",
+    "build-prod": "cross-env NODE_ENV=production webpack",
+  },
+  "webpack": {
+    "development": {
+      ...
+    },
+    "production": {
+      ...
+    }
+  }
+}
+```
+
+I recommend using [cross-env](https://npmjs.com/package/cross-env) to set environment
+variables.
+
 ## Integration with `pkgcfg`
 Need more dynamic behavior? `webpkg` works well with [pkgcfg](https://npmjs.com/package/pkgcfg).
 
