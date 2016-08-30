@@ -9,11 +9,7 @@
 
 <sup><sub><sup><sub>.</sub></sup></sub></sup>
 
-## WORK IN PROGRESS
-
-<sup><sub><sup><sub>.</sub></sup></sub></sup>
-
-**The shortest webpack configuration file you've ever seen!**
+### The shortest webpack configuration file you've ever seen!
 
 **webpack.config.js**:
 ```js
@@ -45,7 +41,9 @@ Now, you can configure webpack from your package.json:
 }
 ```
 
+
 ## Options
+
 All standard [Webpack configuration options](https://webpack.github.io/docs/configuration.html) are supported.
 
 Configuring a full Webpack project from scratch is a lot of work, so `webpkg`
@@ -56,21 +54,124 @@ Set this to the name of an (installed) module yielding a webpack configuration
 when `require`d and it will be used as the base configuration; the other changes
 you make in `package.json` will be applied on top of this base configuration.
 
-### pluginsPre
-The Webpack `plugins` property is an array, which makes manipulating it in the
-`package.json` difficult. `pluginsPre` lets `webpkg` *prepend* the entries to
-the existing `plugins` in stead of replacing them.
+### extcfg
+Set this to the name of an (installed) module yielding a webpack configuration
+when `require`d and it will be used as an extension to the base configuration;
+it will first be applied to the base configuration after which the changes you
+make in `package.json` will be applied on top of that.
 
-### pluginsPost
-The counterpart of `pluginsPre`, `pluginsPost` lets `webpkg` *append* the entries to
-the existing `plugins` in stead of replacing them.
+
+## option inheritance
+
+`webpkg` offers an inheritance strategy for options in `package.json` that
+allows us to place shared options in the base config and differing options in
+extended configs.
+
+### environment variables
+You can use environment variables to control which set of options will be used.
+There are two environment variables that `webpkg` will respond to:
+* `WEBPKG`: e.g. `'client'`, `'server'`, etc
+* `NODE_ENV`: e.g. `'production'`, `'development'`, `'test'` etc.
+
+You can use both environment variables at the same time. However, please observe
+these rules:
+* The names of top-level webpack configuration variables may not be used
+* The names for `WEBPKG` may not overlap with the names for `NODE_ENV`
+* When given the choice, *webpkg* will prioritize `WEBPKG` over `NODE_ENV`
+
+### examples
+Given this configuration in `package.json`:
+```json
+{
+  "webpack": {
+    "entry": "base",
+
+    "production": {
+      "entry": "prod",
+
+      "client": {
+        "entry": "prod-client"
+      },
+
+      "server": {
+        "entry": "prod-server"
+      }
+    },
+
+    "development": {
+      "client": {
+        "entry": "dev-client"
+      },
+
+      "server": {
+        "entry": "dev-server"
+      }
+    },
+
+    "client": {
+      "entry": "client"
+    }
+  }
+}
+```
+The option `entry` would yield different values depending on `WEBPKG` and `NODE_ENV`:
+* `WEBPKG=server, NODE_ENV=development` ==> 'dev-server'
+* `WEBPKG=server, NODE_ENV=production` ==> 'prod-server'
+* `WEBPKG=client, NODE_ENV=development` ==> 'client'
+* `WEBPKG=client, NODE_ENV=production` ==> 'client'
+
+In the first two cases, `webpkg` has no choice but to follow the paths
+* `webpack->production->server`
+* `webpack->production->client`
+
+However, for the last two cases, `webpkg` is given a choice, as `webpack` has both
+the properties `production` and `client`. Due to the third rule, `webpkg` will
+prioritize the `WEBPKG` environment variable, so it takes the path
+* `webpack->client` at which point it can't go deeper.
+
+## Integration with `pkgcfg`
+Need more dynamic behavior? `webpkg` works well with [pkgcfg](https://npmjs.com/package/pkgcfg).
+
+### Install `pkgcfg`
+```sh
+npm install --save pkgcfg
+```
+
+Then, modify your `webpack.config.js` to read:
+
+```js
+module.exports = require('webpkg')(require('pkgcfg')())
+```
+
+This uses `pkgcfg` to read your `package.json` and process the tags you have used,
+after which the resulting JSON object is passed on to `webpkg`.
+
+Now, you should be able to do things like:
+
+```json
+{
+  "name": "webpkgcfg-example",
+  "version": "1.0.0",
+  "webpack": {
+    "entry": "./src/{pkg name}",
+    "output": {
+      "filename": "./bin/{pkg name}-{pkg version}.js"
+    }
+  }
+}
+```
 
 ## Issues
+
 Add an issue in this project's [issue tracker](https://github.com/download/webpkg/issues)
 to let me know of any problems you find, or questions you may have.
 
+
 ## Copyright
+
 Copyright 2016 by [Stijn de Witt](http://StijnDeWitt.com). Some rights reserved.
 
+
 ## License
+
 [Creative Commons Attribution 4.0 (CC-BY-4.0)](https://creativecommons.org/licenses/by/4.0/)
