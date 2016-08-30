@@ -142,11 +142,13 @@ Here is how we can configure our scripts section to accomplish that:
     "build-prod": "cross-env NODE_ENV=production webpack",
   },
   "webpack": {
+    "entry": "common options",
+
     "development": {
-      ...
+      "entry": "development options"
     },
     "production": {
-      ...
+      "entry": "production options"
     }
   }
 }
