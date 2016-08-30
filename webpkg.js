@@ -62,7 +62,7 @@ function loadCfg(result, p, name) {
 function loadCfgs(result, cfgs) {
   for (var i=0,c; c=cfgs[i]; i++) {
     try {
-      if (c.indexOf('./') === 0) {c = path.resolve(rootPath.toString(), c)}
+      if (c.indexOf('./') === 0) {c = path.resolve(appRoot.toString(), c)}
       log && log.log('webpkg.loadCfgs: loading configuration from ' + c)
       var config = require(c);
       log && log.debug('webpkg.loadCfgs: loaded configuration: ', config)
