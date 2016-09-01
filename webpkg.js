@@ -2,6 +2,7 @@ var fs = require('fs')
 var path = require('path')
 var extend = require('extend')
 var appRoot = require('app-root-path')
+var rfr = require('rfr')
 var log; try {log=require('picolog');} catch(e){}
 
 function webpkg(pkg, env) {
@@ -62,9 +63,8 @@ function loadCfg(result, p, name) {
 function loadCfgs(result, cfgs) {
   for (var i=0,c; c=cfgs[i]; i++) {
     try {
-      if (c.indexOf('./') === 0) {c = path.resolve(appRoot.toString(), c)}
       log && log.log('webpkg.loadCfgs: loading configuration from ' + c)
-      var config = require(c);
+      var config = c.indexOf('./') === 0 ? rfr(c) : require(c)
       log && log.debug('webpkg.loadCfgs: loaded configuration: ', config)
       result = extend(true, result, config);
       log && log.debug('webpkg.loadCfgs: merged in configuration. result: ', result)
