@@ -1,6 +1,6 @@
 {
   "name": "webpkg",
-  "version": "0.3.3",
+  "version": "0.3.2",
   "description": "Load your webpack configuration from package.json",
   "main": "webpkg.js",
   "scripts": {
@@ -29,8 +29,7 @@
   },
   "dependencies": {
     "app-root-path": "^1.3.0",
-    "extend": "^3.0.0",
-    "rfr": "^1.2.3"
+    "extend": "^3.0.0"
   },
   "webpack": {
     "basecfg": "./test/base",

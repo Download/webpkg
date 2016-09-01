@@ -1,4 +1,4 @@
-# webpkg <sup><sub>0.3.3</sub></sup>
+# webpkg <sup><sub>0.3.2</sub></sup>
 ## Load your webpack configuration from package.json
 
 [![npm](https://img.shields.io/npm/v/webpkg.svg?maxAge=2592000)](https://npmjs.com/package/webpkg)
