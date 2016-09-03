@@ -1,8 +1,12 @@
 {
   "name": "webpkg",
-  "version": "0.3.4",
+  "version": "0.4.0",
   "description": "Load your webpack configuration from package.json",
   "main": "webpkg.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/download/webpkg.git"
+  },
   "scripts": {
     "tst": "mocha webpkg.spec.js",
     "tst-server": "cross-env WEBPKG=server npm run -s tst",
@@ -35,6 +39,9 @@
     "basecfg": "./test/base",
     "extcfg": "./test/extend",
     "devtool": "standard",
+    "resolve": {
+      "extensions": ["", ".webpack.js", ".web.js", ".js", ".json", ".jsx"]
+    },
     "plugins": [
       "test"
     ],
@@ -42,24 +49,55 @@
       "extcfg": "./test/extend-production",
       "devtool": "production",
       "entry": "./production",
+      "resolve": {
+        "alias": {
+          "NODE_ENV": "production"
+        }
+      },
       "client": {
         "basecfg": "./test/base-production",
-        "devtool": "production-client"
+        "devtool": "production-client",
+        "resolve": {
+          "alias": {
+            "WEBPKG": "client"
+          }
+        }
       },
       "server": {
         "basecfg": "./test/base-production",
-        "devtool": "production-server"
+        "devtool": "production-server",
+        "resolve": {
+          "alias": {
+            "WEBPKG": "server"
+          }
+        }
       }
     },
     "development": {
       "basecfg": "./test/base-development",
       "devtool": "development",
+      "resolve": {
+        "alias": {
+          "NODE_ENV": "development"
+        }
+      },
+
       "client": {
         "devtool": "development-client",
-        "extcfg": "./test/extend-development-client"
+        "extcfg": "./test/extend-development-client",
+        "resolve": {
+          "alias": {
+            "WEBPKG": "client"
+          }
+        }
       },
       "server": {
-        "devtool": "development-server"
+        "devtool": "development-server",
+        "resolve": {
+          "alias": {
+            "WEBPKG": "server"
+          }
+        }
       }
     }
   }

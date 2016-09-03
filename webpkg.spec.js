@@ -80,4 +80,20 @@ describe('webpkg', function(){
 		expect(cfg).to.have.a.property('devtool')
     expect(cfg.devtool).to.equal(expected)
 	});
+
+	it('performs deep extension of base profiles.', function(){
+		expect(cfg).to.have.a.property('resolve')
+		expect(cfg.resolve).to.have.a.property('extensions')
+		if (process.env.NODE_ENV || process.env.WEBPKG) {
+			expect(cfg.resolve).to.have.a.property('alias')
+		}
+		if (process.env.NODE_ENV) {
+			expect(cfg.resolve.alias).to.have.a.property('NODE_ENV')
+			expect(cfg.resolve.alias.NODE_ENV).to.equal(process.env.NODE_ENV)
+		}
+		if (process.env.WEBPKG) {
+			expect(cfg.resolve.alias).to.have.a.property('WEBPKG')
+			expect(cfg.resolve.alias.WEBPKG).to.equal(process.env.WEBPKG)
+		}
+	});
 });

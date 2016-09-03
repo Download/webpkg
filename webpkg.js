@@ -80,19 +80,19 @@ function loadWebpkg(pkg, e, t, p, path, result) {
   }
 
   if (! result) {
-    result = extend({}, p || {})
+    result = extend(true, {}, p || {})
     log && log.debug('webpkg.loadWebpkg: merged in webpack root configuration from package.json...', result)
   }
 
   if (p && t && p[t]) {
     var pth = path + '.' + t;
-    result = extend(result, p[t])
+    result = extend(true, result, p[t])
     log && log.debug('webpkg.loadWebpkg: merged in profile configuration from ' + pth, result)
     loadWebpkg(pkg, e, t, p[t], pth, result)
   }
   else if (p && e && p[e]) {
     var pth = path + '.' + e;
-    result = extend(result, p[e])
+    result = extend(true, result, p[e])
     log && log.debug('webpkg.loadWebpkg: merged in environment configuration from ' + pth, result)
     loadWebpkg(pkg, e, t, p[e], pth, result)
   }
