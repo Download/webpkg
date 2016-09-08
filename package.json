@@ -32,7 +32,7 @@
     "picolog": "^1.0.4"
   },
   "dependencies": {
-    "app-root-path": "^1.3.0",
+    "app-root-path": "^2.0.1",
     "extend": "^3.0.0"
   },
   "webpack": {
