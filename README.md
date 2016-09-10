@@ -216,14 +216,8 @@ Need more dynamic behavior? `webpkg` works well with [pkgcfg](https://npmjs.com/
 npm install --save pkgcfg
 ```
 
-Then, modify your `webpack.config.js` to read:
-
-```js
-module.exports = require('webpkg')(require('pkgcfg')())
-```
-
-This uses `pkgcfg` to read your `package.json` and process the tags you have used,
-after which the resulting JSON object is passed on to `webpkg`.
+Webpkg automatically detects that `pkgcfg` is installed and uses it to read your `package.json` 
+and process the tags you have used, after which the resulting JSON object is passed on to `webpkg`.
 
 Now, you should be able to do things like:
 
