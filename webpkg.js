@@ -1,12 +1,14 @@
+var log; try {log = require('picolog')} catch(e){}
 var fs = require('fs')
 var path = require('path')
 var extend = require('extend')
-var appRoot = require('app-root-path')
-var log; try {log=require('picolog');} catch(e){}
+var pkgcfg; try {pkgcfg = require('pkgcfg')} catch(e){}
+var globalCfg; try{globalCfg = (pkgcfg && pkgcfg()) || require('../../package.json')}catch(e){} try{globalCfg = globalCfg || (typeof process != 'undefined' && JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'package.json'))))}catch(e){}
 
-function webpkg(pkg, env) {
+
+module.exports = function webpkg(pkg, env) {
   if (!pkg) {
-    pkg = path.resolve(appRoot.toString(), 'package.json')
+    pkg = globalCfg;
     log && log.debug('webpkg: using configuration from ' + pkg)
   }
   if (typeof pkg == 'string') {
@@ -27,11 +29,9 @@ function webpkg(pkg, env) {
       'NODE_ENV:' + (e ? '"' + e + '"' : '"" (disabled)') + ', ' +
       'WEBPKG:'   + (t ? '"' + t + '"' : '"" (disabled)')
   )
-  return webpkg.load(pkg, e, t);
+  return loadConfiguration(pkg, e, t);
 }
 
-module.exports = webpkg
-webpkg.load = loadConfiguration
 
 // === IMPLEMENTATION ===
 
@@ -62,7 +62,7 @@ function loadCfg(result, p, name) {
 function loadCfgs(result, cfgs) {
   for (var i=0,c; c=cfgs[i]; i++) {
     try {
-      if (c.indexOf('./') === 0) {c = path.resolve(appRoot.toString(), c)}
+      if (c.indexOf('./') === 0) {c = path.resolve(process.cwd(), c)}
       log && log.log('webpkg.loadCfgs: loading configuration from ' + c)
       var config = require(c);
       log && log.debug('webpkg.loadCfgs: loaded configuration: ', config)

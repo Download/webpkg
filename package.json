@@ -1,6 +1,6 @@
 {
   "name": "webpkg",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Load your webpack configuration from package.json",
   "main": "webpkg.js",
   "repository": {
@@ -32,7 +32,6 @@
     "picolog": "^1.0.4"
   },
   "dependencies": {
-    "app-root-path": "^1.3.0",
     "extend": "^3.0.0"
   },
   "webpack": {
@@ -40,7 +39,14 @@
     "extcfg": "./test/extend",
     "devtool": "standard",
     "resolve": {
-      "extensions": ["", ".webpack.js", ".web.js", ".js", ".json", ".jsx"]
+      "extensions": [
+        "",
+        ".webpack.js",
+        ".web.js",
+        ".js",
+        ".json",
+        ".jsx"
+      ]
     },
     "plugins": [
       "test"
@@ -81,7 +87,6 @@
           "NODE_ENV": "development"
         }
       },
-
       "client": {
         "devtool": "development-client",
         "extcfg": "./test/extend-development-client",
