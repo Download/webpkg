@@ -27,7 +27,7 @@
   "license": "CC-BY-4.0",
   "devDependencies": {
     "chai": "^3.5.0",
-    "cross-env": "^2.0.1",
+    "cross-env": "^3.1.0",
     "mocha": "^3.0.2",
     "picolog": "^1.0.4"
   },
