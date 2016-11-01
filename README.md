@@ -1,4 +1,4 @@
-# webpkg <sup><sub>0.5.0</sub></sup>
+# webpkg <sup><sub>0.6.0</sub></sup>
 ## Load your webpack configuration from package.json
 
 [![npm](https://img.shields.io/npm/v/webpkg.svg?maxAge=2592000)](https://npmjs.com/package/webpkg)
@@ -13,7 +13,7 @@
 
 **webpack.config.js**:
 ```js
-module.exports = require('webpkg')();
+module.exports = require('webpkg')()
 ```
 <sup><sub><sup><sub>.</sub></sup></sub></sup>
 
@@ -26,7 +26,7 @@ npm install --save webpkg
 Create a `webpack.config.js` in the root of your project and add this code:
 
 ```js
-module.exports = require('webpkg')();
+module.exports = require('webpkg')()
 ```
 
 Now, you can configure webpack from your package.json:
@@ -35,12 +35,26 @@ Now, you can configure webpack from your package.json:
 {
   "name": "webpkg-example",
   "version": "1.0.0",
+  "main": "./main.js",
   "webpack": {
     "entry": "./main.js"
   }
 }
 ```
 
+Combine with [https://npmjs.com/package/pkgcfg](pkgcfg) for creating expressive
+configurations within JSON:
+
+```json
+{
+  "name": "webpkg-example",
+  "version": "1.0.0",
+  "main": "./main.js",
+  "webpack": {
+    "entry": "{pkg main}"
+  }
+}
+```
 
 ## Options
 
@@ -109,8 +123,87 @@ it will first be applied to the base configuration after which the changes you
 make in `package.json` will be applied on top of that.
 
 `extcfg` works in exactly the same way as `basecfg`. Only when used together
-does an extra behavior arrise: `basecfg` is applied first and then `extcfg`
-is applied on top of that. This is convenient in combination with *option inheritance*.
+does an extra behavior arise: `basecfg` is applied first and then `extcfg`
+is applied on top of that. This is convenient in combination with 
+[option inheritance](#option-inheritance).
+
+### plugins 
+An array of plugin specification strings/objects.
+The way webpack specifies plugins makes it tricky to specify them in JSON. Most
+of the plugins are constructor functions that have to be instantiated with new.
+To help with this, webpkg processes the plugins specified in the `plugins`, 
+`pluginsPre` and `pluginsPost` configuration options.
+
+If the plugin specification is a string, it is assumed to be a module name.
+Webpkg will `require` the module and use the default exported object. If it's 
+a function, it will be called with the webpack configuration (including any custom 
+properties) as the first argument and the resulting value will be used.
+
+If the plugin specification is an object, it should contain a single property,
+the name of which specifies the module to require and the value of which being 
+a nested object. This nested object in turn should contain a single property, 
+the name of which specifies the plugin to import from the module. As a value,
+this property should have an array. The contents of this array will be passed as
+arguments to the plugin constructor function.
+
+#### examples
+```json
+{
+  "plugins": [
+    {
+      "webpack": {
+        "optimize.DedupePlugin": []
+      }
+    }
+  ]
+}
+```
+
+is equivalent to
+
+```js
+var webpack = require('webpack')
+module.exports = {
+  plugins: [
+    new webpack.optimize.DedupePlugin()
+  ]
+}
+```
+
+and
+
+```json
+{
+  "plugins": [
+    {
+      "webpack": {
+        "DefinePlugin": [
+          "process.env.NODE_ENV",
+          "production"
+        ]
+      }
+    }
+  ]
+}
+```
+is equivalent to 
+```js
+var webpack = require('webpack')
+module.exports = {
+  plugins: [
+    new webpack.DefinePlugin('process.env.NODE_ENV', 'production')
+  ]
+}
+```
+
+
+### pluginsPre
+Allows you to specify plugins that will be prepended before the existing `plugins`.
+This is convenient in combination with [option inheritance](#option-inheritance).
+
+### pluginsPost
+Allows you to specify plugins that will be appended after the existing `plugins`.
+This is convenient in combination with [option inheritance](#option-inheritance).
 
 
 ## option inheritance
@@ -130,7 +223,7 @@ You can use both environment variables at the same time. However, please observe
 these rules:
 * The names of top-level webpack configuration variables may not be used
 * The names for `WEBPKG` may not overlap with the names for `NODE_ENV`
-* When given the choice, *webpkg* will prioritize `WEBPKG` over `NODE_ENV`
+* When given the choice, webpkg will prioritize `WEBPKG` over `NODE_ENV`
 
 ### examples
 Given this configuration in `package.json`:
@@ -210,14 +303,15 @@ I recommend using [cross-env](https://npmjs.com/package/cross-env) to set enviro
 variables.
 
 ## Integration with `pkgcfg`
-Need more dynamic behavior? `webpkg` works well with [pkgcfg](https://npmjs.com/package/pkgcfg).
+Need more dynamic behavior? `webpkg` uses [pkgcfg](https://npmjs.com/package/pkgcfg) to 
+load and parse the package.json file, meaning you can use all it's power in your 
+webpack configuration as well.
+
+Add it as an explicit dependency to your project:
 
 ```sh
 npm install --save pkgcfg
 ```
-
-Webpkg automatically detects that `pkgcfg` is installed and uses it to read your `package.json` 
-and process the tags you have used, after which the resulting JSON object is passed on to `webpkg`.
 
 Now, you should be able to do things like:
 
