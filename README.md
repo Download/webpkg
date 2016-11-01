@@ -42,7 +42,7 @@ Now, you can configure webpack from your package.json:
 }
 ```
 
-Combine with [https://npmjs.com/package/pkgcfg](pkgcfg) for creating expressive
+Combine with [pkgcfg](https://npmjs.com/package/pkgcfg) for creating expressive
 configurations within JSON:
 
 ```json
